@@ -6,13 +6,13 @@ import {
   ParseIntPipe,
   Post,
   Res,
-  UsePipes,
-  ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ResponseHandler } from 'src/common/utils/responses';
 import { Response } from 'express';
 import { CreateUserDto } from 'src/users/dtos/CreateUserDto';
 import { UsersService } from 'src/users/services/users/users.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -25,6 +25,7 @@ export class UsersController {
     return ResponseHandler.success(res, 'Account created successfully.', user);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   async getUsers(@Res() res: Response) {
     const users = await this.userService.findAll();
