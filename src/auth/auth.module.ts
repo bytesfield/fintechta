@@ -5,11 +5,12 @@ import { UsersService } from 'src/users/services/users/users.service';
 import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, UsersService, LocalStrategy],
+  providers: [AuthService, UsersService, LocalStrategy, JwtStrategy],
   imports: [
     UsersModule,
     JwtModule.register({

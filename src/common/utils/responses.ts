@@ -1,11 +1,15 @@
 import { Response } from 'express';
 
 export class ResponseHandler {
-  static success(res: Response, message: string, data?: any) {
+  public static success(res: Response, message: string, data?: any) {
     res.status(200).json(this.createResponseObject('success', message, data));
   }
 
-  static error(res: Response, message: string, status = 500) {
+  public static created(res: Response, message: string, data?: any) {
+    res.status(201).json(this.createResponseObject('success', message, data));
+  }
+
+  public static error(res: Response, message: string, status = 500) {
     res.status(status).json({
       status: 'failed',
       message,

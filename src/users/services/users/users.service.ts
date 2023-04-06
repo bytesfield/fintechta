@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserParams, UpdateUserParams } from 'src/common/types';
-import Hash from 'src/common/utils/hash';
-import { User } from 'src/database/typeorm/entities/User';
+import Hash from '../../../common/utils/hash';
+import { User } from '../../../database/typeorm/entities/User';
 
 import { Repository, UpdateResult } from 'typeorm';
 

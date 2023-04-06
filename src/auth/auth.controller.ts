@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ResponseHandler } from 'src/common/utils/responses';
+import { ResponseHandler } from '../common/utils/responses';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local.auth.guard';
 

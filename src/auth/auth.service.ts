@@ -1,6 +1,5 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { User } from 'src/database/typeorm/entities/User';
-import { UsersService } from 'src/users/services/users/users.service';
+import { Injectable, Logger } from '@nestjs/common';
+import { UsersService } from '../users/services/users/users.service';
 import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
@@ -16,7 +15,9 @@ export class AuthService {
       const user = await this.usersService.findUserByUsername(username);
 
       if (user && compareSync(password, user?.password)) {
-        return user;
+        const { password, ...result } = user;
+
+        return result;
       }
 
       return null;
@@ -27,11 +28,10 @@ export class AuthService {
   }
 
   public async login(user: any) {
-    const payload = { user, sub: user.id };
+    const payload = { id: user.id, sub: user.id };
 
     return {
-      userId: user.id,
-      email: user.email,
+      user,
       accessToken: this.jwtService.sign(payload),
     };
   }
