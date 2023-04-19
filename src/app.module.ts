@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { databaseConfig } from './common/config';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -17,6 +18,10 @@ import { AuthModule } from './auth/auth.module';
       ...databaseConfig,
       entities: [User],
       synchronize: true,
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
     }),
     AuthModule,
   ],

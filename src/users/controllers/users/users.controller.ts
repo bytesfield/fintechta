@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ResponseHandler } from '../../../common/utils/responses';
-import { Response, Request } from 'express';
 import { CreateUserDto } from '../../dtos/CreateUserDto';
 import { UsersService } from '../../services/users/users.service';
 import { JwtAuthGuard } from '../../../auth/guards/jwt.auth.guard';

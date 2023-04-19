@@ -9,6 +9,8 @@ import { User } from '../../../database/typeorm/entities/User';
 import { TypeORMMySqlTestingModule } from '../../../database/typeorm/utils/testing-database';
 import { UsersService } from '../../services/users/users.service';
 import { UsersController } from './users.controller';
+import { createMock } from '@golevelup/ts-jest';
+import { ExecutionContext } from '@nestjs/common';
 
 describe('UsersController', () => {
   let usersController: UsersController;
@@ -26,6 +28,9 @@ describe('UsersController', () => {
     status: jest.fn().mockReturnThis(),
     json: jest.fn(),
   };
+
+  const mockExecutionContext = createMock<ExecutionContext>();
+  const mockedRequest = mockExecutionContext.switchToHttp().getRequest();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

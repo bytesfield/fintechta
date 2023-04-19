@@ -37,6 +37,16 @@ export class UsersService {
     return user;
   }
 
+  async findUserByEmail(email: string): Promise<User | null> {
+    const user = await this.usersRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   async create(payload: CreateUserParams): Promise<User | null> {
     const newUser = this.usersRepository.create({
       ...payload,
@@ -48,7 +58,7 @@ export class UsersService {
     return await this.usersRepository.save(newUser);
   }
 
-  update(id: number, payload: UpdateUserParams): Promise<UpdateResult> {
+  update(id: number, payload: UpdateUserParams | any): Promise<UpdateResult> {
     return this.usersRepository.update(
       { id },
       { ...payload, updated_at: new Date() },

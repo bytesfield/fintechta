@@ -1,4 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
+import { after } from 'node:test';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -24,6 +25,10 @@ export class User {
 
   @Column({ nullable: true, default: 0 })
   status: boolean;
+
+  @Column({ nullable: true })
+  @Exclude()
+  refresh_token?: string;
 
   @Column({ nullable: true })
   email_verified_at: Date;
