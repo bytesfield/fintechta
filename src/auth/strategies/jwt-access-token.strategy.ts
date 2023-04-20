@@ -5,12 +5,12 @@ import { applicationConfig } from '../../common/config';
 import { UsersService } from '../../users/services/users/users.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private userService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: applicationConfig.jwtSecret,
+      secretOrKey: applicationConfig.jwtAccessTokenSecret,
     });
   }
 

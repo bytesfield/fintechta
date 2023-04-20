@@ -12,6 +12,7 @@ import { extractTokenFromHeader } from 'src/common/utils/helpers';
 import { ResponseHandler } from '../common/utils/responses';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.auth.guard';
+import { JwtRefreshTokenGuard } from './guards/jwt.refresh-token.guard';
 import { LocalAuthGuard } from './guards/local.auth.guard';
 
 @Controller('auth')
@@ -31,21 +32,19 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   async logOut(@Req() req, @Res() res: Response) {
-    await this.authService.removeRefreshToken(req.user.email);
+    await this.authService.logout(req.user);
 
     req.res.setHeader('Authorization', null);
 
     return ResponseHandler.success(res, 'Logout successfully');
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshTokenGuard)
   @Post('refresh-token')
   async refreshToken(@Req() req: Request, @Res() res: Response) {
     const token = extractTokenFromHeader(req);
 
-    const response = await this.authService.createAccessTokenFromRefreshToken(
-      token,
-    );
+    const response = await this.authService.refreshToken(token);
 
     return ResponseHandler.success(
       res,

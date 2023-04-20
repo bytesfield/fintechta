@@ -1,15 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserParams, UpdateUserParams } from 'src/common/types';
 import Hash from '../../../common/utils/hash';
 import { User } from '../../../database/typeorm/entities/User';
 
 import { Repository, UpdateResult } from 'typeorm';
+import { AuthService } from '../../../auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -55,7 +63,13 @@ export class UsersService {
 
     newUser.password = await Hash.make(payload.password);
 
-    return await this.usersRepository.save(newUser);
+    const user = await this.usersRepository.save(newUser);
+
+    const tokens = await this.authService.getTokens(user.id);
+
+    await this.authService.updateRefreshToken(tokens.refreshToken, user.id);
+
+    return user;
   }
 
   update(id: number, payload: UpdateUserParams | any): Promise<UpdateResult> {

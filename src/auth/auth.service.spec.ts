@@ -6,7 +6,7 @@ import { applicationConfig } from '../common/config';
 import { User } from '../database/typeorm/entities/User';
 import { TypeORMMySqlTestingModule } from '../database/typeorm/utils/testing-database';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtAccessTokenStrategy } from './strategies/jwt-access-token.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 
 describe('AuthService', () => {
@@ -19,11 +19,18 @@ describe('AuthService', () => {
         TypeOrmModule.forFeature([User]),
         JwtModule.register({
           global: true,
-          secret: applicationConfig.jwtSecret,
-          signOptions: { expiresIn: applicationConfig.jtwExpiresIn },
+          secret: applicationConfig.jwtAccessTokenSecret,
+          signOptions: {
+            expiresIn: applicationConfig.jwtAccessTokenExpiration,
+          },
         }),
       ],
-      providers: [AuthService, UsersService, LocalStrategy, JwtStrategy],
+      providers: [
+        AuthService,
+        UsersService,
+        LocalStrategy,
+        JwtAccessTokenStrategy,
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);

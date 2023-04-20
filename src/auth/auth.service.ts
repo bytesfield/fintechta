@@ -1,6 +1,8 @@
 import {
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -11,10 +13,12 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './types/jwt-payload.interface';
 import Hash from '../common/utils/hash';
 import { UpdateResult } from 'typeorm';
+import { applicationConfig } from '../common/config';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
@@ -38,27 +42,28 @@ export class AuthService {
 
   public async login(user: any) {
     const userId = user.id;
-    const payload = { id: userId, sub: userId };
-    const accessToken = this.jwtService.sign(payload);
 
-    await this.setCurrentRefreshToken(accessToken, userId);
+    const { accessToken, refreshToken } = await this.getTokens(userId);
+
+    await this.updateRefreshToken(refreshToken, userId);
 
     return {
       user,
       accessToken,
+      refreshToken,
     };
   }
 
-  public validateToken(jwt: string): any {
-    return this.jwtService.verify(jwt);
+  public validateToken(token: string): any {
+    return this.jwtService.verify(token);
   }
 
-  public async createAccessTokenFromRefreshToken(refreshToken: string) {
+  public async refreshToken(refreshToken: string) {
     try {
       const decoded = this.jwtService.decode(refreshToken) as JwtPayload;
 
       if (!decoded) {
-        throw new Error();
+        throw new UnauthorizedException('Access Denied');
       }
 
       const user = await this.usersService.findOne(decoded.id);
@@ -78,11 +83,11 @@ export class AuthService {
 
       return this.login(user);
     } catch {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Access Denied');
     }
   }
 
-  public async setCurrentRefreshToken(
+  public async updateRefreshToken(
     refreshToken: string,
     userId: number,
   ): Promise<UpdateResult> {
@@ -93,10 +98,10 @@ export class AuthService {
     });
   }
 
-  public async removeRefreshToken(email: string): Promise<UpdateResult> {
-    const user = await this.usersService.findUserByEmail(email);
+  public async logout(user: any): Promise<UpdateResult> {
+    const isUserExist = await this.usersService.findOne(user.id);
 
-    if (!user) {
+    if (!isUserExist) {
       throw new HttpException(
         'User with this id does not exist',
         HttpStatus.NOT_FOUND,
@@ -106,5 +111,35 @@ export class AuthService {
     return await this.usersService.update(user.id, {
       refresh_token: null,
     });
+  }
+
+  public async getTokens(userId: number) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          id: userId,
+        },
+        {
+          secret: applicationConfig.jwtAccessTokenSecret,
+          expiresIn: applicationConfig.jwtAccessTokenExpiration,
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          id: userId,
+        },
+        {
+          secret: applicationConfig.jwtRefreshTokenSecret,
+          expiresIn: applicationConfig.jwtRefreshTokenExpiration,
+        },
+      ),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }
