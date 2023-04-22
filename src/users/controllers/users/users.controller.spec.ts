@@ -11,10 +11,13 @@ import { UsersService } from '../../services/users/users.service';
 import { UsersController } from './users.controller';
 import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext } from '@nestjs/common';
+import { AuthService } from '../../../auth/auth.service';
+import { AuthModule } from '../../../auth/auth.module';
 
 describe('UsersController', () => {
   let usersController: UsersController;
   let usersService: UsersService;
+  let authService: AuthService;
 
   let findUserMock: jest.SpyInstance;
   let findUsersMock: jest.SpyInstance;
@@ -37,13 +40,15 @@ describe('UsersController', () => {
       imports: [
         TypeORMMySqlTestingModule([User]),
         TypeOrmModule.forFeature([User]),
+        AuthModule,
       ],
       controllers: [UsersController],
-      providers: [UsersService],
+      providers: [UsersService, AuthService],
     }).compile();
 
     usersController = module.get<UsersController>(UsersController);
     usersService = module.get<UsersService>(UsersService);
+    authService = module.get<AuthService>(AuthService);
 
     findUserMock = jest.spyOn(usersService, 'findOne');
     findUsersMock = jest.spyOn(usersService, 'findAll');

@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { extractTokenFromHeader } from 'src/common/utils/helpers';
+import { extractTokenFromHeader } from '../common/utils/helpers';
 import { ResponseHandler } from '../common/utils/responses';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.auth.guard';

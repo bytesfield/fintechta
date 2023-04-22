@@ -1,8 +1,8 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { applicationConfig } from 'src/common/config';
-import { UsersService } from 'src/users/services/users/users.service';
-import { UsersModule } from 'src/users/users.module';
+import { applicationConfig } from '../common/config';
+import { UsersService } from '../users/services/users/users.service';
+import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAccessTokenStrategy } from './strategies/jwt-access-token.strategy';

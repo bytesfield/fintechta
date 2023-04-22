@@ -1,25 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../../..//database/typeorm/entities/User';
+import { AuthService } from '../../../auth/auth.service';
+import { AuthModule } from '../../../auth/auth.module';
+import { User } from '../../../database/typeorm/entities/User';
 import { TypeORMMySqlTestingModule } from '../../../database/typeorm/utils/testing-database';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
-  let service: UsersService;
+  let usersService: UsersService;
+  let authService: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         TypeORMMySqlTestingModule([User]),
         TypeOrmModule.forFeature([User]),
+        AuthModule,
       ],
-      providers: [UsersService],
+      providers: [UsersService, AuthService],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
+    usersService = module.get<UsersService>(UsersService);
+    authService = module.get<AuthService>(AuthService);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(usersService).toBeDefined();
   });
 });
